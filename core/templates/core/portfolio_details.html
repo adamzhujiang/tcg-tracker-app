@@ -1,0 +1,47 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>{{ portfolio.name }}</h1>
+  <p><strong>Owner:</strong> {{ portfolio.user.username }}</p>
+  <p><strong>Created:</strong> {{ portfolio.created_at }}</p>
+
+  <h3>Cards in this portfolio:</h3>
+  {% if portfolio.entries.all %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Card</th>
+          <th>Set</th>
+          <th>Game</th>
+          <th>Quantity</th>
+          <th>Last Price</th>
+          <th>Total Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in portfolio.entries.all %}
+          <tr>
+            <td>{{ entry.card.name }}</td>
+            <td>{{ entry.card.set_name }}</td>
+            <td>{{ entry.card.game }}</td>
+            <td>{{ entry.quantity }}</td>
+            <td>${{ entry.card.last_price|default:"0.00" }}</td>
+            <td>
+              {% if entry.total_value %}
+                ${{ entry.total_value }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No cards in this portfolio yet.</p>
+  {% endif %}
+
+  <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Home</a>
+</div>
+{% endblock %}

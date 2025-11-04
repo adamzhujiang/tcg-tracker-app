@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h1>My Portfolios</h1>
+<ul>
+    {% for portfolio in portfolios %}
+    <li>
+        <a href="{% url 'portfolio_detail' pk=portfolio.id %}">
+            {{ portfolio.name }}
+        </a>
+    </li>
+    {% empty %}
+    <li>No portfolios found.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
