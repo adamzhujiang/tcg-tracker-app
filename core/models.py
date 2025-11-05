@@ -4,12 +4,12 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Card(models.Model):
-    tcg_id = models.CharField(max_length=100, unique=True)  # id from JustTCG
+    tcg_id = models.CharField(max_length=100, unique=True)  
     name = models.CharField(max_length=255)
     set_name = models.CharField(max_length=255, blank=True, null=True)
     game = models.CharField(max_length=50, db_index=True)
-    last_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    volatility = models.FloatField(default=0.0)   # percent or absolute, your choice
+    price_at_addition = models.FloatField(default=0)  
+    volatility = models.FloatField(default=0.0)   
     last_updated = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):

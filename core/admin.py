@@ -3,7 +3,7 @@ from .models import Card, Portfolio, PortfolioEntry, PricePoint
 
 @admin.register(Card)
 class CardAdmin(admin.ModelAdmin):
-    list_display = ("name", "set_name", "game", "last_price", "volatility", "last_updated")
+    list_display = ("name", "set_name", "game", "price_at_addition", "volatility", "last_updated")
     search_fields = ("name", "set_name", "game")
     list_filter = ("game",)
 

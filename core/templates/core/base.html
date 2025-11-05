@@ -10,47 +10,31 @@
     <link rel="stylesheet" href="{% static 'core/css/theme.css' %}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'home' %}">TCG Tracker</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'portfolios' %}">Portfolios</a>
-                    </li>
-                </ul>
+<nav class="navbar navbar-expand-md navbar-dark bg-primary mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand text-beige" href="{% url 'home' %}">TCG Tracker</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    {% if user.is_authenticated %}
-    <li class="nav-item">
-        <span class="navbar-text me-2">Hello, {{ user.username }}!</span>
-    </li>
-    <li class="nav-item">
-        <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit" class="nav-link btn btn-link p-0" style="display: inline; border: none; background: none;">Logout</button>
-        </form>
-    </li>
-{% else %}
-    <li class="nav-item">
-        <a class="nav-link" href="{% url 'login' %}">Login</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{% url 'register' %}">Register</a>
-    </li>
-{% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link small" href="{% url 'home' %}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link small" href="{% url 'portfolios' %}">Portfolios</a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link small" href="{% url 'logout' %}">Logout</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+  </div>
+</nav>
 
     <div class="container">
         {% block content %}

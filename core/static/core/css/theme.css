@@ -331,3 +331,8 @@ form > button:hover {
     margin-bottom: 10px;
     color: #2c3e80;
 }
+
+.navbar-nav .nav-link {
+    font-size: 0.95rem;  /* smaller text */
+    padding: 0.15rem 0.15rem; /* less padding around buttons */
+}

@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.conf import settings
 import requests
@@ -11,7 +11,6 @@ import json
 from .models import Portfolio, PortfolioEntry, Card
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import views as auth_views 
-
 
 
 def login_view(request):
@@ -54,8 +53,12 @@ def add_portfolio(request):
 
 @login_required
 def portfolio_detail(request, pk):
+    """
+    Shows all cards in a portfolio, including last price and quantity.
+    Passes all necessary context for front-end rendering.
+    """
     portfolio = get_object_or_404(Portfolio, pk=pk, user=request.user)
-    entries = PortfolioEntry.objects.filter(portfolio=portfolio)
+    entries = PortfolioEntry.objects.filter(portfolio=portfolio).select_related('card')
     context = {
         "portfolio": portfolio,
         "entries": entries,
@@ -67,31 +70,49 @@ def portfolio_detail(request, pk):
 @login_required
 @require_POST
 def add_card_to_portfolio(request, portfolio_id):
-    if request.method == 'POST':
-        card_id = request.POST.get('card_id')
-        name = request.POST.get('name')
-        set_name = request.POST.get('set_name')
-        game = request.POST.get('game')
-        last_price = request.POST.get('last_price') or 0
-        quantity = request.POST.get('quantity') or 1
+    """
+    AJAX view to add a card to a portfolio.
+    Ensures last_price is stored as a float.
+    """
+    card_id = request.POST.get('card_id')
+    name = request.POST.get('name')
+    set_name = request.POST.get('set_name')
+    game = request.POST.get('game')
+    last_price = request.POST.get('last_price') or 0
+    quantity = request.POST.get('quantity') or 1
 
-        if not card_id or not name:
-            return JsonResponse({'success': False, 'error': 'Card ID and name are required.'})
+    if not card_id or not name:
+        return JsonResponse({'success': False, 'error': 'Card ID and name are required.'})
 
-        card, created = Card.objects.get_or_create(
-            tcg_id=card_id,
-            defaults={'name': name, 'set_name': set_name, 'game': game, 'last_price': last_price}
-        )
+    try:
+        last_price = float(last_price)
+    except ValueError:
+        last_price = 0.0
 
-        portfolio = Portfolio.objects.get(id=portfolio_id)
-        entry, created = PortfolioEntry.objects.get_or_create(
-            portfolio=portfolio,
-            card=card,
-            defaults={'quantity': quantity}
-        )
+    try:
+        quantity = int(quantity)
+    except ValueError:
+        quantity = 1
 
-        return JsonResponse({'success': True})
-    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+    card, created = Card.objects.get_or_create(
+        tcg_id=card_id,
+        defaults={'name': name, 'set_name': set_name, 'game': game, 'last_price': last_price}
+    )
+
+    portfolio = get_object_or_404(Portfolio, pk=portfolio_id, user=request.user)
+    entry, created = PortfolioEntry.objects.get_or_create(
+        portfolio=portfolio,
+        card=card,
+        defaults={'quantity': quantity}
+    )
+
+    if not created:
+        entry.quantity += quantity
+        entry.last_price = last_price
+        entry.save()
+
+    return JsonResponse({'success': True})
+
 
 @login_required
 def register_view(request):
@@ -140,18 +161,21 @@ def search_cards(request):
     except requests.RequestException as e:
         return JsonResponse({"error": str(e)}, status=500)
 
-@csrf_exempt
-def delete_card_from_portfolio(request, portfolio_id):
-    if request.method != 'POST':
-        return JsonResponse({'success': False, 'error': 'Invalid request method.'})
 
+@login_required
+@require_POST
+def delete_card_from_portfolio(request, portfolio_id):
+    """
+    AJAX view to delete a card from a portfolio.
+    Properly handles CSRF by requiring login and POST method.
+    """
     try:
         data = json.loads(request.body)
         entry_id = data.get('entry_id')
         if not entry_id:
             return JsonResponse({'success': False, 'error': 'PortfolioEntry ID is required.'})
 
-        entry = PortfolioEntry.objects.get(id=entry_id)
+        entry = PortfolioEntry.objects.get(id=entry_id, portfolio_id=portfolio_id)
         entry.delete()
         return JsonResponse({'success': True})
     except PortfolioEntry.DoesNotExist:
@@ -159,10 +183,18 @@ def delete_card_from_portfolio(request, portfolio_id):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
+
 @login_required
 def delete_portfolio(request, pk):
+    """
+    Deletes a portfolio and all its entries.
+    Handles only POST requests to perform deletion.
+    """
     portfolio = get_object_or_404(Portfolio, pk=pk, user=request.user)
     if request.method == "POST":
         portfolio.delete()
+        messages.success(request, "Portfolio deleted successfully.")
         return redirect('portfolios')
-    return redirect('portfolios')
+    else:
+        messages.error(request, "Invalid request method.")
+        return redirect('portfolios')
