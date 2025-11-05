@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()               
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+JUSTTCG_API_KEY = os.getenv("JUSTTCG_API_KEY", "tcg_99d32afb675849868a53ee46f1b92fa5")
 DEBUG = os.getenv("DEBUG") == "True"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

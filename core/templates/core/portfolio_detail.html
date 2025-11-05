@@ -1,0 +1,184 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1>{{ portfolio.name }}</h1>
+  <p><strong>Owner:</strong> {{ portfolio.user.username }}</p>
+  <p><strong>Created:</strong> {{ portfolio.created_at }}</p>
+
+  <h3>Cards in this portfolio:</h3>
+  {% if portfolio.entries.all %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Card</th>
+          <th>Set</th>
+          <th>Game</th>
+          <th>Quantity</th>
+          <th>Last Price</th>
+          <th>Total Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in portfolio.entries.all %}
+          <tr>
+            <td>{{ entry.card.name }}</td>
+            <td>{{ entry.card.set_name }}</td>
+            <td>{{ entry.card.game }}</td>
+            <td>{{ entry.quantity }}</td>
+            <td>${{ entry.card.last_price|default:"0.00" }}</td>
+            <td>{% if entry.total_value %}${{ entry.total_value }}{% else %}N/A{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No cards in this portfolio yet.</p>
+  {% endif %}
+
+  <hr>
+
+  <h3 class="mt-4">Search and Add TCG Products via JustTCG:</h3>
+
+  <div class="mb-3">
+    <label for="game-filter" class="form-label">Filter by Game:</label>
+    <select id="game-filter" class="form-select w-auto">
+      <option value="">All Games</option>
+      <option value="pokemon">Pokémon</option>
+      <option value="disney-lorcana">Lorcana</option>
+      <option value="magic-the-gathering">Magic: The Gathering</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <input type="text" id="justtcg-search" class="form-control form-control-lg border-primary shadow-sm"
+           placeholder="Type a card name to search JustTCG..." autocomplete="off">
+  </div>
+
+  <div id="justtcg-results" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3"></div>
+
+  <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Home</a>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const apiKey = "{{ JUSTTCG_API_KEY }}";
+  const searchInput = document.getElementById('justtcg-search');
+  const resultsContainer = document.getElementById('justtcg-results');
+  const gameFilter = document.getElementById('game-filter');
+  let timeout = null;
+
+  function createCardElement(card) {
+    const col = document.createElement('div');
+    col.classList.add('col');
+
+    const cardDiv = document.createElement('div');
+    cardDiv.classList.add('card', 'h-100', 'shadow-sm');
+
+    const img = document.createElement('img');
+    img.src = card.image || 'https://via.placeholder.com/250x350?text=No+Image';
+    img.classList.add('card-img-top');
+    img.alt = card.name;
+
+    const cardBody = document.createElement('div');
+    cardBody.classList.add('card-body', 'd-flex', 'flex-column');
+
+    const title = document.createElement('h5');
+    title.classList.add('card-title');
+    title.textContent = card.name;
+
+    const setInfo = document.createElement('p');
+    setInfo.classList.add('card-text', 'mb-1');
+    setInfo.textContent = `Set: ${card.set_name || 'Unknown'}`;
+
+    const gameInfo = document.createElement('p');
+    gameInfo.classList.add('card-text', 'mb-2');
+    gameInfo.textContent = `Game: ${card.game || 'Unknown'}`;
+
+    const addButton = document.createElement('button');
+    addButton.classList.add('btn', 'btn-primary', 'mt-auto');
+    addButton.textContent = 'Add to Portfolio';
+    addButton.type = 'button';
+    addButton.addEventListener('click', () => addCardToPortfolio(card));
+
+    cardBody.append(title, setInfo, gameInfo, addButton);
+    cardDiv.append(img, cardBody);
+    col.appendChild(cardDiv);
+
+    return col;
+  }
+
+function addCardToPortfolio(card) {
+    fetch("{% url 'add_card_to_portfolio' portfolio.id %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            card_id: card.id,         
+            name: card.name,
+            set_name: card.set_name,
+            game: card.game,
+            last_price: card.price || 0,
+            quantity: 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Added ${card.name} to your portfolio!`);
+            location.reload();  
+        } else {
+            alert(`Error: ${data.error}`);
+        }
+    })
+    .catch(err => console.error('Add card error:', err));
+}
+
+  async function fetchCards(query, game) {
+    if (!query) {
+      resultsContainer.innerHTML = '';
+      return;
+    }
+
+    const url = new URL('https://api.justtcg.com/v1/cards');
+    url.searchParams.append('q', query);
+    if (game) url.searchParams.append('game', game);
+
+    try {
+      const response = await fetch(url, {
+        headers: { 'x-api-key': apiKey }
+      });
+      const data = await response.json();
+
+      console.log('JustTCG API Response:', data);
+
+      resultsContainer.innerHTML = '';
+      if (!data.data || data.data.length === 0) {
+        resultsContainer.innerHTML = '<p class="text-muted">No results found.</p>';
+        return;
+      }
+
+      data.data.forEach(card => {
+        const cardElem = createCardElement(card);
+        resultsContainer.appendChild(cardElem);
+      });
+    } catch (err) {
+      console.error('Error fetching JustTCG cards:', err);
+      resultsContainer.innerHTML = '<p class="text-danger">Error fetching results.</p>';
+    }
+  }
+
+  function debounceFetch() {
+    clearTimeout(timeout);
+    const query = searchInput.value.trim();
+    const game = gameFilter.value;
+    timeout = setTimeout(() => fetchCards(query, game), 300);
+  }
+
+  searchInput.addEventListener('input', debounceFetch);
+  gameFilter.addEventListener('change', debounceFetch);
+});
+</script>
+{% endblock %}

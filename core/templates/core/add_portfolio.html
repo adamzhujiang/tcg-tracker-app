@@ -1,0 +1,13 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h1>Add New Portfolio</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    <label for="name">Portfolio Name:</label>
+    <input type="text" id="name" name="name" required>
+    <button type="submit">Add Portfolio</button>
+</form>
+
+<a href="{% url 'portfolios' %}">← Back to My Portfolios</a>
+{% endblock %}
