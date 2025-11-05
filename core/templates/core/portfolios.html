@@ -3,18 +3,27 @@
 <h1>My Portfolios</h1>
 
 <a href="{% url 'add_portfolio' %}">
-    <button>Add New Portfolio</button>
+    <button type="button">Add Portfolio</button>
 </a>
 
-<ul>
+<ul style="list-style: none; padding: 0;">
     {% for portfolio in portfolios %}
-    <li>
-        <a href="{% url 'portfolio_detail' pk=portfolio.id %}">
-            {{ portfolio.name }}
-        </a>
+    <li style="margin-bottom: 20px; text-align: center;">
+        <span style="font-weight: bold; font-size: 1.5em; display: block; margin-bottom: 10px;">{{ portfolio.name }}</span>
+        <div class="portfolio-buttons" style="gap: 10px; margin-top: 10px;">
+            <a href="{% url 'portfolio_detail' pk=portfolio.id %}">
+                <button type="button">View</button>
+            </a>
+            <form action="{% url 'delete_portfolio' pk=portfolio.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" onclick="return confirm('Are you sure you want to delete this portfolio?');">
+                    Delete
+                </button>
+            </form>
+        </div>
     </li>
     {% empty %}
-    <li>No portfolios found.</li>
+    <li style="text-align: center;">No portfolios found.</li>
     {% endfor %}
 </ul>
 {% endblock %}

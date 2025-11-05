@@ -19,6 +19,8 @@ load_dotenv()
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 JUSTTCG_API_KEY = os.getenv("JUSTTCG_API_KEY", "tcg_99d32afb675849868a53ee46f1b92fa5")
 DEBUG = os.getenv("DEBUG") == "True"
+STATIC_URL = '/static/'
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

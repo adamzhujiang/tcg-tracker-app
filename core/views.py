@@ -10,6 +10,8 @@ import requests
 import json
 from .models import Portfolio, PortfolioEntry, Card
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import views as auth_views 
+
 
 
 def login_view(request):
@@ -65,55 +67,31 @@ def portfolio_detail(request, pk):
 @login_required
 @require_POST
 def add_card_to_portfolio(request, portfolio_id):
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({"success": False, "error": "Invalid JSON."})
+    if request.method == 'POST':
+        card_id = request.POST.get('card_id')
+        name = request.POST.get('name')
+        set_name = request.POST.get('set_name')
+        game = request.POST.get('game')
+        last_price = request.POST.get('last_price') or 0
+        quantity = request.POST.get('quantity') or 1
 
-    tcg_id = data.get("card_id")
-    name = data.get("name")
-    set_name = data.get("set_name")
-    game = data.get("game")
-    last_price = data.get("last_price", 0)
-    quantity = data.get("quantity", 1)
+        if not card_id or not name:
+            return JsonResponse({'success': False, 'error': 'Card ID and name are required.'})
 
-    if not tcg_id or not name:
-        return JsonResponse({"success": False, "error": "Card ID and name are required."})
+        card, created = Card.objects.get_or_create(
+            tcg_id=card_id,
+            defaults={'name': name, 'set_name': set_name, 'game': game, 'last_price': last_price}
+        )
 
-    try:
-        quantity = int(quantity)
-        if quantity < 1:
-            quantity = 1
-    except (ValueError, TypeError):
-        quantity = 1
+        portfolio = Portfolio.objects.get(id=portfolio_id)
+        entry, created = PortfolioEntry.objects.get_or_create(
+            portfolio=portfolio,
+            card=card,
+            defaults={'quantity': quantity}
+        )
 
-    portfolio = get_object_or_404(Portfolio, pk=portfolio_id, user=request.user)
-
-    card, created = Card.objects.get_or_create(
-        tcg_id=tcg_id,
-        defaults={
-            "name": name,
-            "set_name": set_name,
-            "game": game,
-            "last_price": last_price,
-        }
-    )
-
-    if not created:
-        card.last_price = last_price
-        card.save()
-
-    entry, created = PortfolioEntry.objects.get_or_create(
-        portfolio=portfolio,
-        card=card,
-        defaults={"quantity": quantity}
-    )
-
-    if not created:
-        entry.quantity += quantity
-        entry.save()
-
-    return JsonResponse({"success": True, "card_name": card.name, "quantity": entry.quantity, "last_price": card.last_price})
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
 
 @login_required
 def register_view(request):
@@ -164,22 +142,27 @@ def search_cards(request):
 
 @csrf_exempt
 def delete_card_from_portfolio(request, portfolio_id):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+    try:
+        data = json.loads(request.body)
+        entry_id = data.get('entry_id')
+        if not entry_id:
+            return JsonResponse({'success': False, 'error': 'PortfolioEntry ID is required.'})
+
+        entry = PortfolioEntry.objects.get(id=entry_id)
+        entry.delete()
+        return JsonResponse({'success': True})
+    except PortfolioEntry.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Portfolio entry not found.'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+def delete_portfolio(request, pk):
+    portfolio = get_object_or_404(Portfolio, pk=pk, user=request.user)
     if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            card_tcg_id = data.get("card_id")
-            if not card_tcg_id:
-                return JsonResponse({"success": False, "error": "Card ID is required."})
-
-            portfolio = Portfolio.objects.get(id=portfolio_id)
-
-            entry = portfolio.entries.filter(card__tcg_id=card_tcg_id).first()
-            if entry:
-                entry.delete()
-                return JsonResponse({"success": True})
-            else:
-                return JsonResponse({"success": False, "error": "Card not found in portfolio."})
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-    else:
-        return JsonResponse({"success": False, "error": "Invalid request method."})
+        portfolio.delete()
+        return redirect('portfolios')
+    return redirect('portfolios')
