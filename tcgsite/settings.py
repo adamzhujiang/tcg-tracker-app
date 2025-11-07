@@ -17,9 +17,14 @@ from dotenv import load_dotenv
 import dj_database_url
 load_dotenv()               
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key-for-dev")
 JUSTTCG_API_KEY = os.getenv("JUSTTCG_API_KEY", "tcg_99d32afb675849868a53ee46f1b92fa5")
-DEBUG = os.getenv("DEBUG") == "True"
+
+if 'ON_HEROKU' in os.environ:
+    DEBUG = False
+else:
+    DEBUG = True
+
 STATIC_URL = '/static/'
 
 
@@ -30,14 +35,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8ul020$a_wzjigdpu*vsr2@d4!p1$5w23h=6c)*0bbtedkx!wf'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-if not 'ON_HEROKU' in os.environ:
-DEBUG = True
-
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["your-app-name.herokuapp.com", "localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -56,13 +54,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = 'tcgsite.urls'
@@ -100,19 +98,10 @@ if 'ON_HEROKU' in os.environ:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
+            'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
-            # The value of 'NAME' should match the value of 'NAME' you replaced.
         }
     }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -152,9 +141,10 @@ STATIC_URL = 'static/'
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 LOGIN_URL = '/login/'
-
