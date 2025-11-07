@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 import dj_database_url
 load_dotenv()               
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
 JUSTTCG_API_KEY = os.getenv("JUSTTCG_API_KEY", "tcg_99d32afb675849868a53ee46f1b92fa5")
 DEBUG = os.getenv("DEBUG") == "True"
 STATIC_URL = '/static/'
