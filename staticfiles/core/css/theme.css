@@ -1,0 +1,338 @@
+/* ====== Fonts & Global Styles ====== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Rubik:wght@400;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f5f0e1; /* beige background */
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* ====== Headings ====== */
+h1, h2, h3 {
+    text-align: center;
+    color: #2c3e80;
+    text-shadow: 1px 1px #3b50a0;
+    font-family: 'Rubik', sans-serif;
+}
+
+/* ====== Forms ====== */
+.form-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    background: #fff8e7; /* lighter beige container */
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: bold;
+    color: #2c3e80;
+}
+
+input[type="text"], input[type="password"], select {
+    width: 80%;
+    padding: 0.6rem;
+    border-radius: 10px;
+    border: 2px dashed #2c3e80;
+    margin-top: 0.5rem;
+    text-align: center;
+    font-size: 1rem;
+}
+
+/* ====== Buttons ====== */
+.button {
+    margin-top: 1.5rem;
+    background: linear-gradient(135deg, #2c3e80, #3b50a0);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 0.7rem 1.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.button:hover {
+    transform: scale(1.1) rotate(-2deg);
+    background: linear-gradient(135deg, #3b50a0, #2c3e80);
+}
+
+/* ====== Card & Portfolio Displays ====== */
+.card {
+    background: #fff8e7;
+    border: 2px dashed #2c3e80;
+    border-radius: 15px;
+    padding: 1.5rem;
+    width: 200px; /* increased from 150px */
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+    margin: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ====== Portfolio Card Styling ====== */
+.portfolio-card {
+    background: #fff8e7;
+    border: 2px dashed #2c3e80;
+    border-radius: 15px;
+    padding: 1.5rem;
+    width: 250px; /* increased from 200px */
+    min-height: 180px; /* ensure enough height for buttons */
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+    margin: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between; /* keeps buttons at bottom */
+}
+
+.card:hover, .portfolio-card:hover {
+    transform: translateY(-5px);
+}
+
+/* ====== Layout Containers ====== */
+.search-container, .portfolio-container {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff8e7;
+    border-radius: 20px;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ====== Navbar Styling ====== */
+.navbar {
+    background: linear-gradient(135deg, #2c3e80, #3b50a0);
+    border-bottom: 2px solid #2c3e80;
+    padding: 0.5rem 1rem;
+}
+
+.navbar a {
+    color: #2c3e80; /* bright white for contrast */
+    font-weight: bold;
+    text-decoration: none;
+    margin: 0 0.5rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* subtle shadow for better readability */
+    font-size: 1.05rem; /* slightly larger font */
+}
+
+.navbar a:hover {
+    color: #3b50a0;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+}
+
+@media (max-width: 768px) {
+    input[type="text"], input[type="password"], select {
+        width: 95%;
+    }
+
+    .card, .portfolio-card {
+        width: 100%;
+    }
+
+    .search-container, .portfolio-container {
+        padding: 1rem;
+    }
+}
+
+/* ====== Whimsical Styles ====== */
+.form-container.whimsical-card {
+    background: #fff8e7;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    width: 320px;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+.whimsical-title {
+    color: #2c3e80;
+    text-shadow: 1px 1px #d0d6ff;
+    margin-bottom: 20px;
+}
+
+.whimsical-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #2c3e80;
+    border-radius: 8px;
+    outline: none;
+    background-color: #fff8e7;
+    color: #333;
+}
+
+.whimsical-button {
+    background: linear-gradient(135deg, #2c3e80, #3b50a0);
+    color: #fff;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.whimsical-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.whimsical-link {
+    color: #2c3e80;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.whimsical-link:hover {
+    text-decoration: underline;
+}
+
+.home-container.whimsical-background {
+    background: radial-gradient(circle at top left, #fff8e7, #dfe6f2, #c8d4f0);
+}
+
+.whimsical-text {
+    color: #2c3e80; 
+    font-family: 'Poppins', sans-serif;
+    text-shadow: 1px 1px #d0d6ff;
+}
+
+h1 {
+    font-family: 'Rubik', sans-serif;
+    color: #2c3e80;
+    text-align: center;
+    text-shadow: 2px 2px #3b50a0;
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+li {
+    background: #fff8e7;
+    border: 2px dashed #2c3e80;
+    border-radius: 12px;
+    padding: 15px 20px;
+    text-align: center;
+    width: 200px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    color: #333;
+}
+
+li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+}
+
+/* Portfolio Links */
+li a {
+    font-weight: bold;
+    text-decoration: none;
+    color: #2c3e80;
+    font-size: 1.1rem;
+}
+
+li a:hover {
+    color: #3b50a0;
+}
+
+/* Buttons Styling */
+button {
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Add Portfolio Button */
+a > button {
+    background-color: #2c3e80;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+a > button:hover {
+    background-color: #3b50a0;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Delete Button */
+form > button {
+    background-color: #3b50a0;
+    color: white;
+    margin-left: 10px;
+}
+
+form > button:hover {
+    background-color: #2c3e80;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+/* ====== Navbar Brand Styling ====== */
+.navbar-brand {
+    color: #f5f0e1; /* beige */
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.navbar-brand:hover {
+    color: #fff8e7; /* slightly lighter beige on hover */
+}
+
+/* ====== Portfolio Buttons ====== */
+.portfolio-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap; /* allow buttons to wrap */
+}
+
+.portfolio-buttons button {
+    flex: 1 1 150px; /* make buttons responsive and fit */
+    max-width: 150px; /* prevent too wide */
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    padding: 12px 10px; /* bigger buttons */
+    font-size: 0.95rem; /* reduced font size */
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Portfolio Name */
+.portfolio-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #2c3e80;
+}
+
+.navbar-nav .nav-link {
+    font-size: 0.95rem;  /* smaller text */
+    padding: 0.15rem 0.15rem; /* less padding around buttons */
+}
