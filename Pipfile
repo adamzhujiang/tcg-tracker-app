@@ -10,6 +10,7 @@ whitenoise = "*"
 gunicorn = "*"
 psycopg2-binary = "*"
 dj-database-url = "*"
+djangorestframework = "*"
 
 [dev-packages]
 psycopg2-binary = "*"
