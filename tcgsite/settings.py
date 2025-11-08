@@ -35,7 +35,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-ALLOWED_HOSTS = ["tcg-tracker-app.herokuapp.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = os.getenv(“DJANGO_ALLOWED_HOSTS”, “localhost,127.0.0.1,tcg-tracker-app-f5496fbb2514.herokuapp.com”).split(”,”)
 
 
 # Application definition
