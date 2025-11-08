@@ -12,6 +12,7 @@ psycopg2-binary = "*"
 dj-database-url = "*"
 djangorestframework = "*"
 django-extensions = "*"
+requests = "*"
 
 [dev-packages]
 psycopg2-binary = "*"
