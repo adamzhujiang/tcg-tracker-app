@@ -1,1 +1,1 @@
-web: gunicorn tcg-tracker-app.wsgi
+web: gunicorn tcgsite.wsgi
